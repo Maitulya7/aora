@@ -3,12 +3,10 @@ import React from 'react'
 
 const profile = () => {
   return (
-    <View>
+    <View className='flex'>
       <Text>Profile</Text>
     </View>
   )
 }
 
 export default profile
-
-const styles = StyleSheet.create({})
