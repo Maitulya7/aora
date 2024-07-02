@@ -4,11 +4,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../constants";
 import CustomButton from "../components/CustomButton";
 import { StatusBar } from "expo-status-bar";
+import { Redirect, router } from "expo-router";
 const index = () => {
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: "100%" }}>
-        <View className="w-full items-center h-full px-4">
+        <View className="w-full items-center min-h-[85vh] px-4">
           <Image
             className="w-[130px] h-[84px]"
             resizeMode="contain"
@@ -36,7 +37,7 @@ const index = () => {
           </Text>
           <CustomButton
             title="Continue with Email"
-            handlePress={() => {}}
+            handlePress={() => {router.push('/sign-in')}}
             containerStyles="w-full mt-7"
           />
         </View>
