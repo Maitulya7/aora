@@ -1,29 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
-
 import { images } from "../../constants";
 import { createUser } from "../../lib/appwrite";
-import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
+import FormField from "../../components/FormField";
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 const SignUp = () => {
+  const { setUser, setIsLogged , isLogged} = useGlobalContext();
   const [isSubmitting, setSubmitting] = useState(false);
+  console.log("this is signup page",setIsLogged)
+
   const [form, setForm] = useState({
     username: "",
     email: "",
     password: "",
   });
 
+  useEffect(() => {
+    console.log("isLogged state:", isLogged);
+  }, [isLogged]); 
+
   const submit = async () => {
     if (form.username === "" || form.email === "" || form.password === "") {
       Alert.alert("Error", "Please fill in all fields");
+      return;
     }
 
     setSubmitting(true);
     try {
       const result = await createUser(form.email, form.password, form.username);
+      setUser(result);
+      setIsLogged(true);
 
       router.replace("/home");
     } catch (error) {
