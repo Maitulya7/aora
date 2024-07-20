@@ -1,5 +1,5 @@
-import { View, Text, FlatList, Image } from "react-native";
-import React from "react";
+import { View, Text, FlatList, Image, Alert } from "react-native";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../constants";
 import SearchInput from "../../components/SearchInput";
@@ -7,25 +7,25 @@ import Trending from "../../components/Trending";
 import EmptyState from "../../components/EmptyState";
 import { useState } from "react";
 import { RefreshControl } from "react-native";
+import { getAllPosts } from "../../lib/appwrite";
+import useAppwrite from "../../lib/useAppwrite";
+import VideoCard from "../../components/VideoCard";
 
 const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
+  const { data: Posts, refetch } = useAppwrite(getAllPosts);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // re call videos -> if any new videos are added
-    
-    
+    await refetch();
     setRefreshing(false);
   };
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
-        data={[{ id: 1 }]}
+        data={Posts}
         keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => (
-          <Text className="text-3xl text-white">{item.id}</Text>
-        )}
+        renderItem={({ item }) => <VideoCard video={item} />}
         ListHeaderComponent={() => (
           <View className="my-6 px-4 space-y-6">
             <View className="justify-between items-start flex-row mb-6">
