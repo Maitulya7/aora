@@ -11,7 +11,6 @@ const VideoCard = ({
   },
 }) => {
   const [play, setPlay] = useState(false);
-  console.log(thumbnail)
 
   return (
     <View className="flex-col items-center px-4 mb-14">
