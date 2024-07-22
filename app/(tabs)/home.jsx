@@ -16,6 +16,7 @@ const Home = () => {
   const { data: Posts, refetch } = useAppwrite(getAllPosts);
   const { data: LatestPosts } = useAppwrite(getLatestPosts);
 
+
   const onRefresh = async () => {
     setRefreshing(true);
     await refetch();
