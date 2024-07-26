@@ -1,25 +1,24 @@
-import {
-  View,
-  FlatList,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import { View, FlatList, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import EmptyState from "../../components/EmptyState";
-import { getUserPost } from "../../lib/appwrite";
+import { getUserPost, singOut } from "../../lib/appwrite";
 import useAppwrite from "../../lib/useAppwrite";
 import VideoCard from "../../components/VideoCard";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { icons } from "../../constants";
 import InfoBox from "../../components/InfoBox";
+import { router } from "expo-router";
 
 const Profile = () => {
-  const { user, setUser, isLogged } = useGlobalContext();
+  const { user, setUser, setIsLogged } = useGlobalContext();
   const { data: Posts } = useAppwrite(() => getUserPost(user.$id));
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    await singOut()
+    setUser(null)
+    setIsLogged(false)
+    router.replace('/sign-in')
   };
 
   return (
@@ -43,12 +42,31 @@ const Profile = () => {
 
             <View className="w-16 h-16 border border-secondary rounded-lg justify-center items-center">
               <Image
-                source={{uri: user?.avatar}}
+                source={{ uri: user?.avatar }}
                 className="w-[90%] h-[90%] rounded-lg"
                 resizeMode="cover"
               />
             </View>
-            <InfoBox/>
+            <InfoBox
+              title={user?.username}
+              containerStyle="mt-5"
+              titleStyle="text-lg"
+            />
+            <View className="mt-5 flex-row">
+
+              <InfoBox
+                title={Posts.length || 0}
+                subtitle="Posts"
+                containerStyle="mr-10"
+                titleStyle="text-xl"
+              />
+
+              <InfoBox
+                title="180"
+                subtitle="Followers"
+                titleStyle="text-xl"
+              />
+            </View>
           </View>
         )}
         ListEmptyComponent={() => (
