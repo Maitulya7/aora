@@ -18,6 +18,8 @@ const Home = () => {
   const { data: LatestPosts } = useAppwrite(getLatestPosts);
   const { user, setUser, setIsLogged } = useGlobalContext();
 
+  console.log(Posts);
+
   const onRefresh = async () => {
     setRefreshing(true);
     await refetch();

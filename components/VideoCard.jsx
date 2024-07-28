@@ -1,17 +1,49 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { icons } from "../constants";
 import { ResizeMode, Video } from "expo-av";
+import { likePost, unlikePost, getCurrentUser } from "../lib/appwrite"; // Make sure to import your functions
+import { useGlobalContext } from "../context/GlobalProvider";
 
 const VideoCard = ({
   video: {
     title,
     thumbnail,
     video,
+    like=[],
     creator: { username, avatar },
   },
+  video: { $id: id },
 }) => {
   const [play, setPlay] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(like.length);
+  const {user} = useGlobalContext();
+
+  console.log(id)
+  useEffect(() => {
+    const checkIfLiked = async () => {
+      setLiked(like.includes(user.$id));
+    };
+
+    checkIfLiked();
+  }, [like]);
+
+  const handleLikeToggle = async () => {
+    try {
+      if (liked) {
+        await unlikePost(id, user.$id);
+        setLiked(false);
+        setLikesCount((prev) => prev - 1);
+      } else {
+        await likePost(id, user.$id);
+        setLiked(true);
+        setLikesCount((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error liking/unliking post:", error.message);
+    }
+  };
 
   return (
     <View className="flex-col items-center px-4 mb-14">
@@ -39,31 +71,40 @@ const VideoCard = ({
             </Text>
           </View>
         </View>
-        <View className="p-2">
-          <Image className="w-5 h-5" resizeMode="contain" source={icons.menu} />
-        </View>
+        <TouchableOpacity
+          onPress={handleLikeToggle}
+          className={`p-2 h-8 w-8 rounded-md justify-center items-center ${
+            liked ? "bg-red-500" : "bg-gray-300"
+          }`}
+        >
+          <Image
+            className="w-5 h-5"
+            resizeMode="contain"
+            source={liked ? icons.heart : icons.heartShallow}
+          />
+        </TouchableOpacity>
       </View>
       {play ? (
-         <Video
-         source={{ uri: video }}
-         className="w-full h-60 rounded-xl mt-3"
-         resizeMode={ResizeMode.COVER}
-         useNativeControls
-         shouldPlay
-         onPlaybackStatusUpdate={(status) => {
-           if (status.didJustFinish) {
-             setPlay(false);
-           }
-         }}
-       />
+        <Video
+          source={{ uri: video }}
+          className="w-full h-60 rounded-xl mt-3"
+          resizeMode={ResizeMode.COVER}
+          useNativeControls
+          shouldPlay
+          onPlaybackStatusUpdate={(status) => {
+            if (status.didJustFinish) {
+              setPlay(false);
+            }
+          }}
+        />
       ) : (
-        <TouchableOpacity 
+        <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => setPlay(true)}
           className="w-full h-60 rounded-xl mt-3 relative justify-center items-center"
         >
           <Image
-           source={{ uri: thumbnail }}
+            source={{ uri: thumbnail }}
             className="w-full h-full rounded-xl mt-3"
             resizeMode="cover"
           />
@@ -74,7 +115,9 @@ const VideoCard = ({
           />
         </TouchableOpacity>
       )}
-    
+      <Text className="text-gray-100 text-xs font-pregular mt-2">
+        {likesCount} {likesCount === 1 ? "Like" : "Likes"}
+      </Text>
     </View>
   );
 };
